@@ -9,7 +9,8 @@ const createBlog = async (blogData: IBlog) => {
     const blog = new Blog(blogData);
     const newBlog = await blog.save();
 
-    return newBlog;
+    const populatedBlog = await Blog.findById(newBlog._id).populate('author', '-password'); // Exclude sensitive fields like password
+    return populatedBlog;
 };
 
 // Get all blogs from the database

@@ -2,6 +2,7 @@ import { BlogServices } from './blog.service';
 import sendResponse from '../../utils/sendResponse';
 import catchAsync from '../../utils/catchAsync';
 import httpStatus from 'http-status';
+import AppError from '../../errors/AppError';
 
 // Create a new blog
 export const createBlog = catchAsync( async (req, res) => {
@@ -20,7 +21,8 @@ export const createBlog = catchAsync( async (req, res) => {
 
 // Get all blogs with optional filters
 export const getBlogs = catchAsync( async (req, res) => {
-
+   
+   console.log( "user: ",req.user)
     const result = await BlogServices.getAllBlogsFromDB(); // Call service to get blogs
 
     sendResponse(res, {
@@ -52,10 +54,16 @@ export const updateBlogById = catchAsync( async (req, res) => {
 
     const { id } = req.params; // Get blog ID from URL params
     const updateData = req.body; // Get updated data from request body
-
+    
+    const isExistBlog = await BlogServices.getBlogById(id); 
+    if(!isExistBlog){
+      throw new AppError(httpStatus.NOT_FOUND, "The blog is not found!")
+    }
+    console.log("user: ", req.user)
 
     const result = await BlogServices.updateBlogById(id, updateData); // Call service to update blog
 
+    console.log("result: ", result)
     sendResponse(res, {
       statusCode: httpStatus.OK,
       success: true,
