@@ -8,10 +8,9 @@ import sendResponse from "../../utils/sendResponse";
 
 // admin can block any user by ID
 export const blockUserById = catchAsync(async (req, res) => {
+        const { userId } = req.params;
   
-        const { id } = req.params;
-  
-        const result = await UserServices.blockUserByIdFromDB(id);
+        const result = await UserServices.blockUserByIdFromDB(userId);
 
         sendResponse(res, {
             statusCode: httpStatus.OK,

@@ -1,3 +1,5 @@
+import QueryBuilder from "../../builder/QueryBuilder";
+import { BlogSearchableFields } from "./blog.constant";
 import { IBlog } from "./blog.interface";
 import { Blog } from "./blog.model";
 
@@ -14,16 +16,24 @@ const createBlog = async (blogData: IBlog) => {
 };
 
 // Get all blogs from the database
-const getAllBlogsFromDB = async () => {
-
-    const result = await Blog.find().populate("author"); 
-  
-    return result
+const getAllBlogsFromDB = async (query: Record<string, unknown>) => {
+    const blogQuery = new QueryBuilder(
+        Blog.find().populate('author'),
+        query,
+      )
+        .search(BlogSearchableFields)
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+    
+      const result = await blogQuery.modelQuery;
+      return result;
 };
 
 // Get a single blog by ID
 const getBlogById = async (id: string) => {
-    const blog = await Blog.findById(id).populate("authorId categoryId", "profilePicture name slug");
+    const blog = await Blog.findById(id).populate("author");
     return blog;
 };
 

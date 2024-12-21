@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { userRoutes } from '../mdules/user/user.route';
 import { blogRoutes } from '../mdules/blogs/blog.route';
 import { authRoutes } from '../mdules/Auth/auth.route';
+import { userRoutes } from '../mdules/user/user.route';
 
 
 const router = Router();

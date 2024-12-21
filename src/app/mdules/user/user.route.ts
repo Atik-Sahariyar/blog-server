@@ -6,8 +6,9 @@ import { USER_ROLE } from "./user.constant";
 const router = express.Router();
 
 
-// admin can block any user
-router.patch("/api/admin/users/:userId/block", auth( USER_ROLE.admin), blockUserById);
-
+// admin can blocked any user
+router.patch("/admin/users/:userId/block", auth(USER_ROLE.admin), blockUserById)
 
 export  const userRoutes =  router;
+
+
