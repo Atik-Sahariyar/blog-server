@@ -5,10 +5,9 @@ import { IUser, UserModel } from './user.interface';
 
 const userSchema = new  Schema<IUser>(
     {
-        id: { type: String, required: true},
         name: { type: String, required: true},
         email: { type: String, required: true, unique: true},
-        password: { type: String},
+        password: { type: String, required: true, select: 0 },
         profilePicture: {
            type: String,
            default: "https://www.gstatic.com/images/branding/product/1x/avatar_square_blue_512dp.png"
@@ -16,15 +15,9 @@ const userSchema = new  Schema<IUser>(
         role: { 
             type: String,
             default: "user",
-            enum: ['Super Admin' , 'Admin' , 'user'] 
+            enum: [ 'admin' , 'user'] 
         },
-        status: { 
-            type: String, 
-            default: "in-progress",
-            enum: ['in-progress' , 'blocked']
-        },
-        isDeleted: { type: Boolean, default: false},
-        passwordChangedAt: { type: Date }
+        isBlocked: { type: Boolean, default: false}
     },
     {
         timestamps: true,
@@ -47,15 +40,16 @@ userSchema.pre<IUser>('save', async function (next) {
     return await User.findOne({ email }).select('+password');
   };
   
-  // check token issued time before  changed password
-  userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
-    passwordChangedTimestamp: Date,
-    jwtIssuedTimestamp: number,
+
+
+  // check password matching
+  userSchema.statics.isPasswordMatched = async function (
+    plainTextPassword,
+    hashedPassword,
   ) {
-    const passwordChangedTime =
-      new Date(passwordChangedTimestamp).getTime() / 1000;
-    return passwordChangedTime > jwtIssuedTimestamp;
+    return await bcrypt.compare(plainTextPassword, hashedPassword);
   };
+  
 
   // Post-save hook to reset password in the response
   userSchema.post<IUser>('save', function (doc, next) {
